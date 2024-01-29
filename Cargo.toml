@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-four-bar = { path = "../four-bar-rs/four-bar", features = ["plot"] }
+four-bar = { path = "../four-bar-rs/four-bar", features = ["plot", "csv"] }
 indicatif = { version = "0.17", features = ["improved_unicode"] }
