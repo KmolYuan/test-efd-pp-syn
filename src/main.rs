@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use four_bar::{
     csv, mh,
     plot::{self, *},
@@ -11,7 +9,7 @@ where
     F: mh::ObjFunc<Fitness = mh::Product<P, f64>>,
 {
     const GEN: u64 = 50;
-    let t0 = Instant::now();
+    let t0 = std::time::Instant::now();
     let mut history = Vec::with_capacity(GEN as usize);
     let pb = indicatif::ProgressBar::new(GEN);
     let s = mh::Solver::build(mh::De::default(), func)
