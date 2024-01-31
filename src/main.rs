@@ -30,6 +30,9 @@ where
 }
 
 fn main() {
+    // ../four-bar-rs/test-fb/slice.open.csv
+    // test.csv
+    // test2.csv
     let w = std::fs::File::open("test.csv").unwrap();
     let target = csv::from_reader(w).unwrap();
     let curve1 = syn_test(1, FbPPSyn::from_curve(&target, Mode::Open)).curve(90);
