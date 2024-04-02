@@ -4,9 +4,9 @@ use four_bar::{
     syn::{FbPPSyn, FbSyn, Mode},
 };
 
-fn syn_test<F, P>(i: usize, func: F) -> P
+fn syn_test<F, P: Clone + mh::MaybeParallel + 'static>(i: usize, func: F) -> P
 where
-    F: mh::ObjFunc<Fitness = mh::Product<P, f64>>,
+    F: mh::ObjFunc<Ys = mh::WithProduct<f64, P>>,
 {
     const GEN: u64 = 50;
     let t0 = std::time::Instant::now();
@@ -17,11 +17,10 @@ where
         .pop_num(200)
         .task(|ctx| ctx.gen == GEN)
         .callback(|ctx| {
-            history.push(ctx.best_f.fitness());
+            history.push(ctx.best.get_eval());
             pb.set_position(ctx.gen);
         })
-        .solve()
-        .unwrap();
+        .solve();
     pb.finish();
     println!("Time [{i}]: {:?}", t0.elapsed());
     let path = format!("history_{i}.svg");
@@ -31,7 +30,8 @@ where
 
 fn main() {
     // [Ref] ../four-bar-rs/test-fb/slice.open.csv
-    let w = std::fs::File::open("test3.csv").unwrap();
+    // [Ref] ../four-bar-rs/test-fb/yu2.closed.csv
+    let w = std::fs::File::open("../four-bar-rs/test-fb/yu2.closed.csv").unwrap();
     let target = csv::from_reader(w).unwrap();
     let curve1 = syn_test(1, FbPPSyn::from_curve(&target, Mode::Closed)).curve(90);
     let curve2 = syn_test(2, FbSyn::from_curve(&target, Mode::Closed)).curve(90);
