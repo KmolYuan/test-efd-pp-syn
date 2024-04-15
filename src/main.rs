@@ -1,5 +1,5 @@
 use four_bar::{
-    csv, mh,
+    csv, efd, mh,
     plot::{self, *},
     syn::{FbPPSyn, FbSyn, Mode},
 };
@@ -22,25 +22,36 @@ where
         })
         .solve();
     pb.finish();
-    println!("Time [{i}]: {:?}", t0.elapsed());
+    println!("Time [{i}]: {:.4?}", t0.elapsed());
     let path = format!("history_{i}.svg");
     plot::fb::history(SVGBackend::new(&path, (800, 800)), history).unwrap();
     s.into_result()
 }
 
 fn main() {
-    // [Ref 1] ./crunode.closed.csv
-    // [Ref 2] ../four-bar-rs/test-fb/yu2.closed.csv
-    let w = std::fs::File::open("../four-bar-rs/test-fb/yu2.closed.csv").unwrap();
+    // [Ref 1] ../four-bar-rs/test-fb/yu2.closed.csv
+    // [Ref 2] ./crunode.closed.csv
+    let w = std::fs::File::open("./crunode.closed.csv").unwrap();
     let target = csv::from_reader(w).unwrap();
+    let target_efd = efd::Efd2::from_curve(&target, false);
     let fb = syn_test(1, FbPPSyn::from_curve(&target, Mode::Closed));
     let fb_str = ron::ser::to_string_pretty(&fb, Default::default()).unwrap();
     std::fs::write("syn_1.ron", fb_str).unwrap();
-    let curve1 = fb.curve(90);
-    let fb = syn_test(2, FbSyn::from_curve(&target, Mode::Closed));
+    let curve1 = fb.curve(180);
+    println!(
+        "Error [1]: {:.4?}",
+        target_efd.err(&efd::Efd2::from_curve(&curve1, false))
+    );
+    let func = FbSyn::from_curve(&target, Mode::Closed);
+    println!("Harmonic: {:?}", func.harmonic());
+    let fb = syn_test(2, func);
     let fb_str = ron::ser::to_string_pretty(&fb, Default::default()).unwrap();
     std::fs::write("syn_2.ron", fb_str).unwrap();
-    let curve2 = fb.curve(90);
+    let curve2 = fb.curve(180);
+    println!(
+        "Error [2]: {:.4?}",
+        target_efd.err(&efd::Efd2::from_curve(&curve2, false))
+    );
     plot::fb::Figure::new(None)
         .legend(LegendPos::UL)
         .add_line("Target", &target, Style::Circle, RED)
