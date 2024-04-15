@@ -10,3 +10,4 @@ four-bar = { path = "../four-bar-rs/four-bar", features = [
     "rayon",
 ] }
 indicatif = { version = "0.17", features = ["improved_unicode"] }
+ron = "0.8"
