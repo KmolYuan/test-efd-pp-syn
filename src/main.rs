@@ -29,9 +29,9 @@ where
 }
 
 fn main() {
-    // [Ref] ../four-bar-rs/test-fb/slice.open.csv
-    // [Ref] ../four-bar-rs/test-fb/yu2.closed.csv
-    let w = std::fs::File::open("../four-bar-rs/test-fb/yu2.closed.csv").unwrap();
+    // [Ref 1] ./crunode.closed.csv
+    // [Ref 2] ../four-bar-rs/test-fb/yu2.closed.csv
+    let w = std::fs::File::open("./crunode.closed.csv").unwrap();
     let target = csv::from_reader(w).unwrap();
     let curve1 = syn_test(1, FbPPSyn::from_curve(&target, Mode::Closed)).curve(90);
     let curve2 = syn_test(2, FbSyn::from_curve(&target, Mode::Closed)).curve(90);
@@ -39,7 +39,12 @@ fn main() {
         .legend(LegendPos::UL)
         .add_line("Target", &target, Style::Circle, RED)
         .add_line("P-P. Optimized", &curve1, Style::Line, BLUE)
-        .add_line("Optimized", &curve2, Style::Line, full_palette::ORANGE_900)
+        .add_line(
+            "Optimized",
+            &curve2,
+            Style::DashedLine,
+            full_palette::ORANGE_900,
+        )
         .plot(SVGBackend::new("syn.svg", (1600, 1600)))
         .unwrap();
 }
